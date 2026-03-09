@@ -1,0 +1,133 @@
+{
+  "name": "tainy",
+  "version": "1.4.0",
+  "description": "A versatile and powerful music bot for Discord that brings rhythm and melody to your server. This is a big upgrade of Cylane!",
+  "exports": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "tainy": {
+    "autofix": {
+      "version": "5.1.0",
+      "codename": "kaito_auto"
+    },
+    "codename": "kaito"
+  },
+  "scripts": {
+    "build": "tsc --build --verbose && vite build",
+    "build:client": "vite build",
+    "start": "node --no-deprecation ./dist/index.js",
+    "start:shard": "node --no-deprecation ./dist/cluster/index.js",
+    "dev": "npx nodemon ./src/index.ts",
+    "build:prettier": "npx prettier -w ./src",
+    "start:pm2": "npx pm2-runtime start ecosystem.config.cjs --env production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RainyXeon/Tainy.git"
+  },
+  "keywords": [
+    "discordbot"
+  ],
+  "author": "RainyXeon",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/RainyXeon/Tainy/issues"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "*.database.json"
+    ],
+    "execMap": {
+      "ts": "tsx"
+    }
+  },
+  "homepage": "https://github.com/RainyXeon/Tainy#readme",
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 100
+  },
+  "dependencies": {
+    "@execaman/lyricist": "^2.0.2",
+    "@fastify/cors": "^11.2.0",
+    "@fastify/static": "^9.0.0",
+    "@fastify/websocket": "^10.0.1",
+    "@hammerhq/localization": "^2.2.0",
+    "@sapphire/ratelimits": "^2.4.9",
+    "chalk": "^5.3.0",
+    "clsx": "^2.1.1",
+    "common-tags": "^1.8.2",
+    "discord.js": "^14.16.1",
+    "dotenv": "^16.4.5",
+    "dreamvast.quick.db": "10.0.0-unsupported",
+    "fastify": "^4.28.1",
+    "framer-motion": "^11.12.0",
+    "humanize-duration": "^3.32.1",
+    "i18next": "^25.8.14",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "js-yaml": "^4.1.0",
+    "lucide-react": "^0.511.0",
+    "markdown-it": "^14.1.0",
+    "mongoose": "^8.6.1",
+    "mysql2": "^3.19.0",
+    "node-cron": "^3.0.3",
+    "pg": "^8.12.0",
+    "pidusage": "^3.0.2",
+    "pretty-ms": "^9.1.0",
+    "rainlink": "^1.2.5",
+    "rainlink-apple": "^1.0.5",
+    "rainlink-deezer": "^1.0.9",
+    "rainlink-nico": "^1.0.7",
+    "rainlink-spotify": "^1.0.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^16.5.6",
+    "react-router-dom": "^7.3.0",
+    "recursive-readdir": "^2.2.3",
+    "tailwind-merge": "^3.0.2",
+    "voucher-code-generator": "^1.3.0",
+    "winston": "^3.14.2",
+    "write-file-atomic": "^5.0.1",
+    "ws": "^8.19.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/chillout": "^5.0.6",
+    "@types/common-tags": "^1.8.4",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash": "^4.17.7",
+    "@types/markdown-it": "^13.0.9",
+    "@types/node": "^20.16.4",
+    "@types/node-cron": "^3.0.11",
+    "@types/pidusage": "^2.0.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/recursive-readdir": "^2.2.4",
+    "@types/voucher-code-generator": "^1.1.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^4.4.1",
+    "autoprefixer": "^10.4.21",
+    "copy-dir": "^1.3.0",
+    "dir-archiver": "^2.1.0",
+    "nodemon": "^3.1.4",
+    "plsargs": "^0.1.6",
+    "pm2": "^5.4.2",
+    "postcss": "^8.5.3",
+    "prettier": "^3.3.3",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4",
+    "vite": "^6.3.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "marked@<4.0.10": ">=4.0.10",
+      "undici@<5.26.2": ">=5.26.2"
+    }
+  }
+}

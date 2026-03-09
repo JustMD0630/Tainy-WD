@@ -1,0 +1,370 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "library": "Library",
+    "explore": "Explore",
+    "admin": "Administration",
+    "settings": "Settings",
+    "adjustments": "Adjustments",
+    "menu": "Menu",
+    "changeServer": "Change Server",
+    "logout": "Logout"
+  },
+  "badge": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "premium": "Premium",
+    "user": "User"
+  },
+  "profile": {
+    "title": "My Profile",
+    "edit": "Edit Profile",
+    "bio": "About Me",
+    "noBio": "No bio yet.",
+    "stats": "Statistics",
+    "joined": "Joined",
+    "socials": "Social Links",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "placeholderBio": "Tell us about yourself...",
+    "success": "Profile updated!",
+    "customization": "Customization",
+    "banner": "Profile Banner",
+    "bannerDesc": "Upload an image to customize your profile header.",
+    "uploadBanner": "Upload Banner",
+    "removeBanner": "Remove Banner",
+    "profileColor": "Profile Color",
+    "profileColorDesc": "Choose a color that represents you.",
+    "uploadError": "Error uploading image.",
+    "confirmRejectTitle": "Reject Request",
+    "confirmRejectDesc": "Are you sure you want to reject this friend request?",
+    "requestRejected": "Request rejected",
+    "requestRejectError": "Error rejecting request",
+    "removeFriendTitle": "Remove Friend",
+    "removeFriendDesc": "Are you sure you want to remove this user from your friends list?",
+    "friendRemoved": "Friend removed",
+    "friendRemoveError": "Error removing friend"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Adjust your preferences and Tainy's behavior.",
+    "userTab": "Personal",
+    "guildTab": "Server",
+    "userPrefs": "User Preferences",
+    "guildConfig": "Server Configuration",
+    "dashboardLang": "Dashboard Language",
+    "dashboardLangDesc": "Change the dashboard interface language (Only affects you).",
+    "prefix": "Prefix",
+    "prefixDesc": "The symbol used to invoke legacy text commands.",
+    "botLang": "Bot Language",
+    "botLangDesc": "The language Tainy will respond in for this server.",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "successUser": "Personal preferences saved.",
+    "successGuild": "Server configuration saved.",
+    "success": "Configuration saved successfully.",
+    "error": "Error saving settings."
+  },
+  "banned": {
+    "title": "Access Denied",
+    "subtitle": "Your account has been suspended",
+    "reason": "Reason",
+    "expires": "Expires",
+    "level": "Sanction Level",
+    "permanent": "Permanent",
+    "legacy": "Violation of terms of service (Legacy Ban)",
+    "level2": "Level 2 (Dashboard Block)",
+    "level3": "Level 3 (Total Blacklist)",
+    "appeal": "Appeal Sanction",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Control playback in real-time",
+    "connected": "Connected to voice channel",
+    "disconnected": "Disconnected",
+    "status": {
+      "connected": "Connected",
+      "connecting": "Connecting...",
+      "error": "Error",
+      "disconnected": "Disconnected"
+    },
+    "loading": "Loading player state..."
+  },
+  "library": {
+    "title": "Library",
+    "subtitle": "Manage your playlists and find new songs",
+    "search": {
+      "placeholder": "Search song, artist or link...",
+      "button": "Search"
+    },
+    "playlists": {
+      "title": "My Playlists",
+      "subtitle": "Manage your personal library",
+      "new": "New Playlist",
+      "edit": "Edit",
+      "play": "Play Playlist",
+      "tracks": "tracks",
+      "public": "Public",
+      "private": "Private"
+    },
+    "searchSection": {
+      "title": "Explore Music",
+      "subtitle": "Find your favorite songs",
+      "connected": "Connected",
+      "emptyTitle": "What do you want to listen to today?",
+      "emptySubtitle": "Search on YouTube, Spotify and more",
+      "addToQueue": "Add to Queue",
+      "addToPlaylist": "Add to Playlist"
+    },
+    "playlistSection": {
+        "createPlaceholder": "Playlist name...",
+        "createButton": "Create",
+        "noPlaylists": "You don't have any playlists yet",
+        "editor": {
+            "title": "Playlist Editor",
+            "warning": "⚠️ This form will be sent to Tainy. Do not share passwords or sensitive info.",
+            "nameLabel": "New Playlist Name",
+            "namePlaceholder": "Enter new playlist name!",
+            "descLabel": "New Description",
+            "descPlaceholder": "Enter new description!",
+            "visibilityLabel": "New Visibility",
+            "commentsLabel": "Comments",
+            "commentsOn": "Enabled",
+            "commentsOff": "Disabled",
+            "commentsDescOn": "Anyone can comment on this playlist.",
+            "commentsDescOff": "No one can comment on this playlist.",
+            "cancel": "Cancel",
+            "submit": "Submit"
+        },
+        "delete": "Delete Playlist",
+        "tracks": "tracks"
+    },
+    "empty": "No playlists found."
+  },
+  "explore": {
+      "title": "Explore",
+      "subtitle": "Discover playlists created by the community",
+      "search": "Search playlists or users...",
+      "playAll": "Play All",
+      "tracks": "tracks",
+      "comments": "Comments",
+      "noComments": "No comments yet.",
+      "firstComment": "Be the first to comment on this playlist!",
+      "loginToComment": "Log in to join the conversation.",
+      "placeholderComment": "Write a comment...",
+      "report": {
+        "title": "Report Comment",
+        "subtitle": "Help us keep the community safe. Select a reason:",
+        "reasons": {
+          "spam": "Spam or advertising",
+          "offensive": "Offensive content",
+          "harassment": "Harassment or bullying",
+          "fake": "False information",
+          "other": "Other"
+        },
+        "describe": "Describe the reason for the report...",
+        "back": "Back",
+        "send": "Send Report",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "hiddenComment": "Comment hidden due to reports.",
+      "reveal": "View anyway",
+      "toasts": {
+        "commentPosted": "Comment posted",
+        "commentError": "Error posting comment",
+        "deleteConfirm": "Are you sure you want to delete this comment?",
+        "commentDeleted": "Comment deleted",
+        "deleteError": "You don't have permission to delete this comment",
+        "reportSent": "Report sent to administrators",
+        "reportError": "Error sending report",
+        "playing": "Playing: {{name}}",
+        "playError": "Could not play. Connect to a voice channel."
+      }
+    },
+    "admin": {
+    "title": "Administration Panel",
+    "subtitle": "Global management of Tainy",
+    "tabs": {
+      "overview": "Overview",
+      "reports": "Reports",
+      "notifications": "Notifications",
+      "banned": "Banned Users",
+      "history": "History",
+      "servers": "Servers"
+    },
+    "stats": {
+      "users": "Active Users (Web)",
+      "playlists": "Playlists",
+      "public": "public",
+      "comments": "Comments",
+      "pendingReports": "Pending Reports",
+      "systemStatus": "System Status",
+      "guilds": "Discord Servers",
+      "discordUsers": "Total Users (Discord)",
+      "uptime": "Uptime",
+      "cpuUsage": "CPU Usage",
+      "ramUsage": "RAM Usage",
+      "processUptime": "Process Uptime",
+      "systemUptime": "System Uptime",
+      "lavalinkNodes": "Lavalink Nodes",
+      "connected": "CONNECTED",
+      "disconnected": "DISCONNECTED",
+      "players": "Players",
+      "load": "Load",
+      "noStats": "No stats available",
+      "noNodes": "No Lavalink nodes configured",
+      "botOverview": "Bot Overview",
+      "cores": "Cores",
+      "ram": "RAM"
+    },
+    "reports": {
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "dismissed": "Dismissed",
+        "resolved": "Resolved"
+      },
+      "search": "Search by ID, user...",
+      "noResults": "No results",
+      "noResultsDesc": "No reports found with current filters.",
+      "reportedBy": "Reported By",
+      "reportedUser": "Reported User",
+      "reason": "Reason",
+      "actions": {
+        "dismiss": "Dismiss",
+        "warn": "Warn",
+        "mute": "Mute",
+        "delete": "Delete",
+        "ban": "Ban User",
+        "restore": "Restore",
+        "context": "View Context"
+      }
+    },
+    "notifications": {
+      "read": "Read",
+      "unread": "Unread",
+      "empty": "No notifications recorded",
+      "sort": {
+        "label": "Sort by:",
+        "date": "Date",
+        "read": "Status (Read/Unread)"
+      }
+    },
+    "banned": {
+      "level": "Level",
+      "expires": "Expires",
+      "permanent": "Permanent",
+      "remaining": "Remaining",
+      "legacy": "Suspension (Legacy)",
+      "revoke": "Revoke Suspension",
+      "empty": "No banned users."
+    },
+    "history": {
+      "search": "Search history by User ID...",
+      "button": "Search",
+      "empty": "No records found for this user.",
+      "headers": {
+        "user": "User",
+        "warns": "Warns",
+        "bans": "Bans",
+        "lastInfraction": "Last Infraction"
+      },
+      "back": "Back to list"
+    },
+    "servers": {
+      "title": "Server Management",
+      "search": "Search server by name or ID...",
+      "sort": {
+        "label": "Sort by:",
+        "members": "Members",
+        "name": "Name",
+        "joined": "Joined Date",
+        "created": "Created Date"
+      },
+      "headers": {
+        "name": "Server",
+        "members": "Members",
+        "owner": "Owner",
+        "joined": "Joined",
+        "created": "Created",
+        "status": "Status"
+      },
+      "playing": "Playing",
+      "idle": "Idle",
+      "actions": {
+        "leave": "Leave Server"
+      },
+      "empty": "No servers found.",
+      "modal": {
+        "leaveTitle": "Leave Server?",
+        "leaveConfirm": "Are you sure you want to force Tainy to leave this server?",
+        "reasonLabel": "Message to owner (Optional)",
+        "reasonPlaceholder": "Explain why the bot is leaving...",
+        "reasonHelp": "If left blank, the bot will leave without sending a message.",
+        "success": "Left server successfully.",
+        "error": "Error leaving server."
+      }
+    },
+    "modal": {
+      "dismiss": "Dismiss Report?",
+      "restore": "Restore Report?",
+      "ban": "Ban User?",
+      "mute": "Mute User?",
+      "warn": "Warn User?",
+      "unban": "Revoke Suspension?",
+      "delete": "Delete Comment?",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "v5.2.5 - Kaito Update",
+      "title1": "Music",
+      "title2": "comes alive on",
+      "title3": "Discord",
+      "subtitle": "Tainy transforms your server with high-quality sound, collaborative playlists, and an intuitive web dashboard. The ultimate experience for communities.",
+      "ctaLogin": "Add to Discord",
+      "ctaFeatures": "View Features",
+      "stats": "Used by {{count}}k+ servers"
+    },
+    "welcomeBack": "Welcome back,",
+    "welcome": "Welcome back!",
+    "activitySummary": "Here is a summary of your music activity.",
+    "features": {
+      "title": "Everything you need",
+      "subtitle": "Designed to be the only music bot you'll ever need.",
+      "quality": {
+        "title": "Studio Quality",
+        "desc": "High-fidelity playback directly in your voice channels. Feel the music as it should be."
+      },
+      "fast": {
+        "title": "Lightning Fast",
+        "desc": "Optimized for low latency. No cuts, no waiting, just instant music."
+      },
+      "secure": {
+        "title": "Total Security",
+        "desc": "Advanced moderation system and data protection for your server."
+      },
+      "easy": {
+        "title": "Easy to Use",
+        "desc": "Intuitive control panel and simple commands that everyone can understand."
+      }
+    },
+    "nav": {
+      "login": "Login with Discord",
+      "dashboard": "Dashboard",
+      "user": "User"
+    },
+    "footer": {
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "support": "Support",
+      "copyright": "Made with ❤️."
+    }
+  }
+}
