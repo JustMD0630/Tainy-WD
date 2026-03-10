@@ -78,7 +78,10 @@ export class WebServer {
     
     // Debug de rutas registradas una vez que Fastify esté listo
     this.app.ready(() => {
-      console.log('[DEBUG] Rutas registradas:\n' + this.app.printRoutes())
+      // Solo imprimir rutas en modo desarrollo o si se fuerza con DEBUG_ROUTES
+      if (process.env.NODE_ENV !== 'production' || process.env.DEBUG_ROUTES === '1') {
+        console.log('[DEBUG] Rutas registradas:\n' + this.app.printRoutes())
+      }
     })
 
     // Middleware de logging para todas las peticiones (Antes de cualquier ruta)

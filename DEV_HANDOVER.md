@@ -27,6 +27,17 @@ Se han realizado correcciones críticas de seguridad en el backend para prevenir
 3.  **Protección Global de Admin**:
     *   Se aseguró que todas las rutas bajo `/v1/admin` estén cubiertas por el middleware de autenticación global (`preValidation` hook).
 
+### ⚙️ Logging Gates & Auth Caching
+
+1.  **Logging Gates**:
+    *   Para reducir el ruido en producción, la impresión de todas las rutas registradas al inicio (`this.app.printRoutes()`) ahora está condicionada.
+    *   Solo se imprime si `NODE_ENV !== 'production'` o si se establece la variable de entorno `DEBUG_ROUTES=1`.
+
+2.  **Auth Caching (Discord /@me)**:
+    *   Se implementó un caché en memoria (TTL 60s) para la validación de tokens de administrador en `getAuthedUserId`.
+    *   Esto evita llamar a la API de Discord en cada request cuando se realizan múltiples acciones administrativas consecutivas, reduciendo latencia y riesgo de rate-limiting.
+    *   **Requisito**: El entorno de ejecución debe ser Node.js 18+ para soporte nativo de `fetch`. Si `fetch` no está disponible, la función retornará `null` (auth fallido) y logueará una advertencia.
+
 ### ✅ Funcionalidades Completadas y Mejoradas
 
 1.  **Dashboard Web (`/dashboard`)**:
