@@ -15,6 +15,8 @@ import { getSearch } from './route/getSearch.js'
 import { getCommands } from './route/getCommands.js'
 import http from 'node:http'
 import { WebSocketServer } from 'ws'
+import pidusage from 'pidusage'
+import os from 'node:os'
 
 import { getAuthLogin } from './route/auth/getAuthLogin.js'
 import { getAuthCallback } from './route/auth/getAuthCallback.js'
@@ -158,11 +160,6 @@ export class WebServer {
 
         try {
             // Reusing logic from getStats.ts broadly
-            // We need to import these dynamically or move getStats logic to a service if we want to be clean
-            // For now, we inline a simplified version for speed
-            const os = await import('node:os')
-            const pidusage = (await import('pidusage')).default
-
             let stats
             try {
                 stats = await pidusage(process.pid)

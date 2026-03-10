@@ -97,6 +97,7 @@ Se ha completado la integración del panel de administración (`/admin`) con el 
     *   **Visualización Profesional**: Integración de `recharts` para gráficos de área (CPU, RAM) con historial de 60 segundos.
     *   **Indicadores Vivos**: Estado de conexión WebSocket y updates de uptime/nodos Lavalink en tiempo real.
     *   **Seguridad**: Autenticación de WebSocket mediante Token Bearer con validación estricta de roles.
+    *   **Fix Reciente**: Se implementó reconexión automática y manejo de dependencias del token para evitar que el usuario tenga que recargar la página.
 
 5.  **Social y Explorar (`/explore`)**:
     *   **Meta Tags (Open Graph)**: Embeds enriquecidos con imagen grande y descripción al compartir el enlace en Discord/Twitter.

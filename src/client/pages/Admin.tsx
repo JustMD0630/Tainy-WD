@@ -213,65 +213,84 @@ export default function Admin() {
 
   // WebSocket Connection
   useEffect(() => {
-      if (!user || configStatus !== 'success') return
+      if (!user || configStatus !== 'success' || !token) return
 
       const isAdmin = config.botOwnerId === user.id || (config.botAdmins || []).includes(user.id)
       if (!isAdmin) return
 
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const host = window.location.host
-      
-      if (wsRef.current) return
+      const connect = () => {
+          if (wsRef.current?.readyState === WebSocket.OPEN) return
 
-      const ws = new WebSocket(`${protocol}//${host}/v1/websocket?type=admin&authorization=Bearer ${token}`)
-      
-      ws.onopen = () => {
-          console.log('[Admin] WS Connected')
-      }
-
-      ws.onmessage = (event) => {
-          try {
-              const payload = JSON.parse(event.data)
-              if (payload.op === 'stats') {
-                  const data = payload.data
-                  
-                  // Update current stats
-                  setStats(prev => {
-                      if (!prev) return data // If null, set initial
-                      return { ...prev, ...data }
-                  })
-
-                  // Update history
-                  setStatsHistory(prev => {
-                      const newPoint = {
-                          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                          cpu: parseFloat(data.system.cpu.toFixed(1)),
-                          memory: parseFloat((data.system.memory / 1024 / 1024).toFixed(1)) // MB
-                      }
-                      const newHistory = [...prev, newPoint]
-                      if (newHistory.length > 60) newHistory.shift() // Keep last 60 seconds
-                      return newHistory
-                  })
-              }
-          } catch (e) {
-              console.error('WS Error', e)
+          const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+          const host = window.location.host
+          
+          console.log('[Admin] Connecting to WS...')
+          const ws = new WebSocket(`${protocol}//${host}/v1/websocket?type=admin&authorization=Bearer ${token}`)
+          
+          ws.onopen = () => {
+              console.log('[Admin] WS Connected')
           }
+
+          ws.onmessage = (event) => {
+              try {
+                  const payload = JSON.parse(event.data)
+                  if (payload.op === 'stats') {
+                      const data = payload.data
+                      
+                      // Update current stats
+                      setStats(prev => {
+                          // Merge with previous to avoid flickering if some fields are missing (though backend sends full object)
+                          if (!prev) return data
+                          return { ...prev, ...data }
+                      })
+
+                      // Update history
+                      setStatsHistory(prev => {
+                          const newPoint = {
+                              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                              cpu: parseFloat(data.system.cpu.toFixed(1)),
+                              memory: parseFloat((data.system.memory / 1024 / 1024).toFixed(1)) // MB
+                          }
+                          const newHistory = [...prev, newPoint]
+                          if (newHistory.length > 60) newHistory.shift() // Keep last 60 seconds
+                          return newHistory
+                      })
+                  }
+              } catch (e) {
+                  console.error('WS Error', e)
+              }
+          }
+
+          ws.onclose = (e) => {
+              console.log('[Admin] WS Closed', e.code, e.reason)
+              wsRef.current = null
+              // Reconnect automatically after 3s
+              setTimeout(() => {
+                  if (location.pathname === '/admin') { // Only reconnect if still on admin page
+                      connect()
+                  }
+              }, 3000)
+          }
+
+          ws.onerror = (err) => {
+              console.error('[Admin] WS Error', err)
+              ws.close()
+          }
+
+          wsRef.current = ws
       }
 
-      ws.onclose = () => {
-          console.log('[Admin] WS Closed')
-          wsRef.current = null
-      }
-
-      wsRef.current = ws
+      connect()
 
       return () => {
           if (wsRef.current) {
+              // Remove onclose to prevent reconnect loop during unmount
+              wsRef.current.onclose = null 
               wsRef.current.close()
               wsRef.current = null
           }
       }
-  }, [user, config, configStatus])
+  }, [user, config, configStatus, token])
   
   const getTimeLeft = (expires?: number) => {
       if (!expires) return null
