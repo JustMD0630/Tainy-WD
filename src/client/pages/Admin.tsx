@@ -230,8 +230,8 @@ export default function Admin() {
 
       try {
         const [statsRes, reportsRes, notesRes, bannedRes, guildsRes, historyRes] = await Promise.all([
-            apiFetch<{ stats: AdminStats }>(`/v1/admin/stats?userId=${user.id}`),
-            apiFetch<{ reports: Report[] }>(`/v1/admin/reports?userId=${user.id}`),
+            apiFetch<{ stats: AdminStats }>(`/v1/admin/stats`),
+            apiFetch<{ reports: Report[] }>(`/v1/admin/reports`),
             apiFetch<{ notifications: AdminNotification[] }>(`/v1/admin/notifications?userId=${user.id}`),
             apiFetch<BannedUser[]>(`/v1/admin/users/banned?userId=${user.id}`),
             apiFetch<{ guilds: AdminGuild[] }>(`/v1/admin/guilds?userId=${user.id}`),
@@ -273,8 +273,8 @@ export default function Admin() {
       if (!user || !confirmAction) return
 
       let endpoint = '/v1/admin/action'
+      // We do not send userId anymore, the backend gets it from the token
       let body: any = {
-          userId: user.id,
           action: confirmAction.action,
           reportId: confirmAction.reportId,
           commentId: confirmAction.commentId,
@@ -287,7 +287,6 @@ export default function Admin() {
       if (confirmAction.action === 'leave_guild') {
           endpoint = `/v1/admin/guilds/${confirmAction.guildId}/leave`
           body = { 
-              userId: user.id,
               reason: leaveReason
           }
       }

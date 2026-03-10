@@ -51,6 +51,25 @@ Para facilitar el desarrollo local sin conflictos de CORS ni necesidad de recons
     *   **Terminal 2 (Frontend)**: `npx vite` (Corre en puerto 5173 aprox)
     *   El frontend en puerto 5173 podrá comunicarse con el backend en 2333 sin problemas de CORS gracias al proxy.
 
+### 🔧 Admin Reports UI (End-to-End)
+
+Se ha completado la integración del panel de administración (`/admin`) con el backend securizado:
+
+1.  **Carga de Datos**:
+    *   El dashboard ahora utiliza rutas relativas (`/v1/admin/reports`, etc.) aprovechando el proxy de desarrollo.
+    *   Se eliminó el envío explícito del parámetro `userId` en las URLs de fetch, confiando plenamente en el header `Authorization` (Bearer token).
+
+2.  **Acciones de Moderación**:
+    *   Las acciones (dismiss, ban, mute, warn, etc.) se envían a `/v1/admin/action` sin incluir el `userId` del administrador en el cuerpo, previniendo suplantación.
+    *   La UI maneja correctamente los estados de carga y errores (401/403).
+
+3.  **Testing Manual (Admin Reports)**:
+    *   **Prerrequisitos**: Estar logueado como Admin (ID en `app.yml` -> `botOwnerId` o `botAdmins`).
+    *   **Ver Reportes**: Navegar a `/admin` -> Pestaña "Reportes". Deben cargar los reportes pendientes.
+    *   **Ejecutar Acción**: Click en "Descartar" o "Banear". Confirmar en el modal.
+        *   *Expected*: Toast de éxito ("Acción realizada correctamente") y el reporte desaparece de la lista.
+        *   *Backend Log*: Debería mostrar la validación del token y la ejecución de la acción.
+
 ### ✅ Funcionalidades Completadas y Mejoradas
 
 1.  **Dashboard Web (`/dashboard`)**:
