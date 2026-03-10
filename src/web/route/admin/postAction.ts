@@ -1,6 +1,7 @@
 import util from 'node:util'
 import { Manager } from '../../../manager.js'
 import Fastify from 'fastify'
+import { getAuthedUserId } from '../../util/auth.js'
 
 import { Comment } from '../../../database/schema/Comment.js'
 import { Notification } from '../../../database/schema/Notification.js'
@@ -11,7 +12,7 @@ export class PostAdminAction {
 
   async main(req: Fastify.FastifyRequest, res: Fastify.FastifyReply) {
     // Auth Check
-    const { userId } = req.body as { userId: string, action: string, reportId: string, commentId?: string }
+    const userId = await getAuthedUserId(req)
     if (!userId) return res.code(401).send({ error: 'Unauthorized' })
 
     const isAdmin = this.client.owner === userId || (this.client.config.bot.ADMIN || []).includes(userId)

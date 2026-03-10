@@ -1,6 +1,6 @@
 # 📘 Tainy Project Handover & Status Report
 
-**Fecha:** 07 de Marzo de 2026
+**Fecha:** 09 de Marzo de 2026
 **Proyecto:** Tainy - Bot de Música Avanzado con Dashboard Web
 **Stack:** Node.js (Backend), React + Vite (Frontend), Discord.js, Fastify, QuickDB (MySQL Driver).
 
@@ -9,6 +9,23 @@
 ## 🚀 Estado Actual del Proyecto
 
 El proyecto ha madurado significativamente, puliendo la experiencia de usuario (UX/UI), la estabilidad del sistema y la navegación.
+
+### 🛡️ Actualización de Seguridad (Marzo 2026)
+
+Se han realizado correcciones críticas de seguridad en el backend para prevenir accesos no autorizados y suplantación de identidad.
+
+1.  **Protección de Playlists**:
+    *   Se eliminó el bypass de autenticación que permitía modificar playlists sin token válido en `/v1/playlists`.
+    *   Ahora todas las operaciones de escritura (POST, PATCH, DELETE) requieren un token Bearer válido.
+    *   Las operaciones de lectura (GET) siguen siendo accesibles si se diseñaron como públicas, pero bajo control estricto.
+
+2.  **Validación de Identidad en Admin**:
+    *   **Problema Corregido**: Los endpoints de administración (`/v1/admin/reports`, `/v1/admin/action`) confiaban ciegamente en el parámetro `userId` enviado por el cliente.
+    *   **Solución**: Se implementó `getAuthedUserId` (en `src/web/util/auth.ts`) que valida el token contra la API de Discord para obtener la identidad real del solicitante.
+    *   El parámetro `userId` en query/body ha sido eliminado o ignorado para fines de autorización.
+
+3.  **Protección Global de Admin**:
+    *   Se aseguró que todas las rutas bajo `/v1/admin` estén cubiertas por el middleware de autenticación global (`preValidation` hook).
 
 ### ✅ Funcionalidades Completadas y Mejoradas
 
@@ -158,11 +175,6 @@ Si retomas el proyecto, aquí es donde nos quedamos:
 
 4.  **Pruebas End-to-End (E2E)**:
     *   No hay tests automatizados. Sería ideal añadir Cypress o Playwright para asegurar que el flujo de Login -> Dashboard -> Reproducir no se rompa con futuros cambios.
-
----
-
-**Para el próximo Agente/Dev:**
-El sistema es estable y la cola de reproducción funciona perfectamente (Drag & Drop + Visualización correcta). La prioridad ahora es **refinar el rendimiento** (Code Splitting) y **expandir las características sociales/admin** según el feedback de los usuarios. ¡El frontend ya está en un estado muy pulido y profesional! 🚀
 
 ---
 

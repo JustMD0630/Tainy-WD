@@ -1,13 +1,14 @@
 import util from 'node:util'
 import { Manager } from '../../../manager.js'
 import Fastify from 'fastify'
+import { getAuthedUserId } from '../../util/auth.js'
 
 export class GetAdminReports {
   constructor(protected client: Manager) {}
 
   async main(req: Fastify.FastifyRequest, res: Fastify.FastifyReply) {
-    // Auth Check (userId passed in query for simple check, ideally via session/header)
-    const { userId } = req.query as { userId?: string }
+    // Auth Check
+    const userId = await getAuthedUserId(req)
     if (!userId) return res.code(401).send({ error: 'Unauthorized' })
 
     const isAdmin = this.client.owner === userId || (this.client.config.bot.ADMIN || []).includes(userId)

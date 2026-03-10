@@ -95,6 +95,7 @@ export class WebServer {
       const isProtected =
         url.startsWith('/v1/players') ||
         (url.startsWith('/v1/playlists') && req.method !== 'GET') || 
+        url.startsWith('/v1/admin') ||
         url.startsWith('/v1/websocket')
       
       if (!isProtected) return done()
@@ -106,9 +107,6 @@ export class WebServer {
       if (client.config.utilities.WEB_SERVER.httpreq) {
         console.log(`[AUTH CHECK] Checking access for ${url}`)
       }
-
-      // TEMPORARY FIX: Allow all playlist operations to bypass strict auth check if token is missing
-      if (url.startsWith('/v1/playlists')) return done()
       
       // Allow user settings and profile patch to handle their own auth
       if (url.startsWith('/v1/user/') || url.startsWith('/v1/users/')) return done()
