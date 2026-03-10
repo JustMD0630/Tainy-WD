@@ -1,18 +1,21 @@
 import { Manager } from '../../../manager.js'
 import Fastify from 'fastify'
 
+import { getAuthedUserId } from '../../util/auth.js'
+
 export class PostGuildLeave {
   constructor(protected client: Manager) {}
 
   async main(req: Fastify.FastifyRequest, res: Fastify.FastifyReply) {
     // Auth Check
-    const { userId, reason } = req.body as { userId?: string, reason?: string }
-    const { guildId } = req.params as { guildId: string }
+    const authedUserId = await getAuthedUserId(req)
+    if (!authedUserId) return res.code(401).send({ error: 'Unauthorized' })
 
-    if (!userId) return res.code(401).send({ error: 'Unauthorized' })
-
-    const isAdmin = this.client.owner === userId || (this.client.config.bot.ADMIN || []).includes(userId)
+    const isAdmin = this.client.owner === authedUserId || (this.client.config.bot.ADMIN || []).includes(authedUserId)
     if (!isAdmin) return res.code(403).send({ error: 'Forbidden' })
+
+    const { reason } = req.body as { reason?: string }
+    const { guildId } = req.params as { guildId: string }
 
     try {
         const guild = this.client.guilds.cache.get(guildId)
@@ -28,7 +31,7 @@ export class PostGuildLeave {
         }
 
         await guild.leave()
-        this.client.logger.info('PostGuildLeave', `Left guild ${guild.name} (${guild.id}) requested by admin ${userId}. Reason: ${reason || 'None'}`)
+        this.client.logger.info('PostGuildLeave', `Left guild ${guild.name} (${guild.id}) requested by admin ${authedUserId}. Reason: ${reason || 'None'}`)
 
         res.send({ success: true, message: `Left guild ${guild.name}` })
     } catch (err) {

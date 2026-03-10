@@ -20,9 +20,10 @@ Se han realizado correcciones críticas de seguridad en el backend para prevenir
     *   Las operaciones de lectura (GET) siguen siendo accesibles si se diseñaron como públicas, pero bajo control estricto.
 
 2.  **Validación de Identidad en Admin**:
-    *   **Problema Corregido**: Los endpoints de administración (`/v1/admin/reports`, `/v1/admin/action`) confiaban ciegamente en el parámetro `userId` enviado por el cliente.
+    *   **Problema Corregido**: Los endpoints de administración (`/v1/admin/reports`, `/v1/admin/action`, `/v1/admin/stats`, etc.) confiaban ciegamente en el parámetro `userId` enviado por el cliente.
     *   **Solución**: Se implementó `getAuthedUserId` (en `src/web/util/auth.ts`) que valida el token contra la API de Discord para obtener la identidad real del solicitante.
     *   El parámetro `userId` en query/body ha sido eliminado o ignorado para fines de autorización.
+    *   **Nota de Seguridad**: Todas las rutas bajo `/v1/admin/*` obtienen identidad únicamente desde Bearer token via `getAuthedUserId`; cualquier `userId` de cliente se ignora.
 
 3.  **Protección Global de Admin**:
     *   Se aseguró que todas las rutas bajo `/v1/admin` estén cubiertas por el middleware de autenticación global (`preValidation` hook).

@@ -232,10 +232,10 @@ export default function Admin() {
         const [statsRes, reportsRes, notesRes, bannedRes, guildsRes, historyRes] = await Promise.all([
             apiFetch<{ stats: AdminStats }>(`/v1/admin/stats`),
             apiFetch<{ reports: Report[] }>(`/v1/admin/reports`),
-            apiFetch<{ notifications: AdminNotification[] }>(`/v1/admin/notifications?userId=${user.id}`),
-            apiFetch<BannedUser[]>(`/v1/admin/users/banned?userId=${user.id}`),
-            apiFetch<{ guilds: AdminGuild[] }>(`/v1/admin/guilds?userId=${user.id}`),
-            apiFetch<{ users: HistoryUser[] }>(`/v1/admin/history/users?userId=${user.id}`)
+            apiFetch<{ notifications: AdminNotification[] }>(`/v1/admin/notifications`),
+            apiFetch<BannedUser[]>(`/v1/admin/users/banned`),
+            apiFetch<{ guilds: AdminGuild[] }>(`/v1/admin/guilds`),
+            apiFetch<{ users: HistoryUser[] }>(`/v1/admin/history/users`)
         ])
 
         if (statsRes.ok) setStats(statsRes.data.stats)

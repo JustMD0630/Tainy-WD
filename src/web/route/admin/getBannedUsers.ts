@@ -1,39 +1,21 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { Manager } from '../../../manager.js'
+import { getAuthedUserId } from '../../util/auth.js'
 
 export class GetBannedUsers {
   constructor(protected client: Manager) {}
 
   async main(req: FastifyRequest, res: FastifyReply) {
-    const { userId } = req.query as { userId: string }
-    
-    // Fallback to strict token check if userId not provided in query (but prefer query for consistency with other admin routes)
-    if (!userId) {
-        const authHeader = req.headers.authorization
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.code(401).send({ error: 'Unauthorized' })
-        }
-        const token = authHeader.split(' ')[1]
-        
-        try {
-            const userRes = await fetch('https://discord.com/api/users/@me', {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            if (!userRes.ok) return res.code(401).send({ error: 'Invalid token' })
-            const adminUser = await userRes.json()
-            return this.process(adminUser.id, res)
-        } catch (e) {
-            return res.code(500).send({ error: 'Failed to verify token' })
-        }
-    } else {
-        return this.process(userId, res)
-    }
+    const authedUserId = await getAuthedUserId(req)
+    if (!authedUserId) return res.code(401).send({ error: 'Unauthorized' })
+
+    const isAdmin = this.client.owner === authedUserId || (this.client.config.bot.ADMIN || []).includes(authedUserId)
+    if (!isAdmin) return res.code(403).send({ error: 'Forbidden' })
+
+    return this.process(authedUserId, res)
   }
 
   async process(adminId: string, res: FastifyReply) {
-    const isAdmin = this.client.owner === adminId || (this.client.config.bot.ADMIN || []).includes(adminId)
-    if (!isAdmin) return res.code(403).send({ error: 'Forbidden' })
-    
     try {
         const allUsers = await this.client.db.user.all()
         const bannedUsers = allUsers.filter(u => u.value.banned || (u.value.banLevel && u.value.banLevel > 0))
