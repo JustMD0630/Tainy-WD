@@ -38,6 +38,19 @@ Se han realizado correcciones críticas de seguridad en el backend para prevenir
     *   Esto evita llamar a la API de Discord en cada request cuando se realizan múltiples acciones administrativas consecutivas, reduciendo latencia y riesgo de rate-limiting.
     *   **Requisito**: El entorno de ejecución debe ser Node.js 18+ para soporte nativo de `fetch`. Si `fetch` no está disponible, la función retornará `null` (auth fallido) y logueará una advertencia.
 
+### 🛠️ Dev Mode (Frontend Proxy)
+
+Para facilitar el desarrollo local sin conflictos de CORS ni necesidad de reconstruir el frontend constantemente:
+
+1.  **Vite Proxy**:
+    *   Se configuró `vite.config.ts` para redirigir automáticamente las peticiones `/v1`, `/api` y `/uploads` al backend (`http://localhost:2333`).
+    *   Esto permite que el frontend use rutas relativas (ej: `/v1/auth/user`) tanto en desarrollo como en producción.
+
+2.  **Ejecución en Desarrollo (2 Terminales)**:
+    *   **Terminal 1 (Backend)**: `npm run dev` (Corre en puerto 2333)
+    *   **Terminal 2 (Frontend)**: `npx vite` (Corre en puerto 5173 aprox)
+    *   El frontend en puerto 5173 podrá comunicarse con el backend en 2333 sin problemas de CORS gracias al proxy.
+
 ### ✅ Funcionalidades Completadas y Mejoradas
 
 1.  **Dashboard Web (`/dashboard`)**:

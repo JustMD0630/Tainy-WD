@@ -16,4 +16,21 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src/client'),
     },
   },
+  server: {
+    proxy: {
+      '/v1': {
+        target: 'http://localhost:2333',
+        changeOrigin: true,
+        ws: true,
+      },
+      '/api': {
+        target: 'http://localhost:2333',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://localhost:2333',
+        changeOrigin: true,
+      }
+    }
+  }
 })

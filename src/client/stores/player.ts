@@ -75,6 +75,14 @@ function wsUrl(guildId: string) {
 
   // Ensure token has Bearer prefix for server validation
   const authorization = token ? `Bearer ${token}` : ''
+  
+  // Dev mode proxy handles /v1, so we can use relative path for WS if no external API set
+  if (!apiBase && import.meta.env.DEV) {
+      // In dev, use current host but change protocol to ws
+      host = window.location.host
+      proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  }
+  
   return `${proto}//${host}/v1/websocket?guildId=${encodeURIComponent(guildId)}&authorization=${encodeURIComponent(authorization)}`
 }
 
