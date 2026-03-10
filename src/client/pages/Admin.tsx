@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { 
   Users, Music, MessageSquare, AlertCircle, 
   LayoutGrid, Flag, Bell, Shield, History,
@@ -7,6 +7,9 @@ import {
   AlertTriangle, ListMusic, Search, Cpu, HardDrive, Zap,
   Filter, Calendar, Clock, ArrowUp, ArrowDown, Check, ChevronDown
 } from 'lucide-react'
+import { 
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer 
+} from 'recharts'
 import { apiFetch } from '@/lib/api'
 import { useConfigStore } from '@/stores/config'
 import { useBotStore } from '@/stores/bot'
@@ -26,6 +29,7 @@ type AdminStats = {
     botGuilds: number
     botUsers: number
     uptime: number
+    playing?: number
     
     system?: {
         cpu: number
@@ -58,6 +62,12 @@ type AdminStats = {
             }
         }
     }>
+}
+
+type StatsPoint = {
+    time: string
+    cpu: number
+    memory: number
 }
 
 type Report = {
@@ -132,7 +142,7 @@ type HistoryUser = {
 export default function Admin() {
   const { config, status: configStatus } = useConfigStore()
   const { info: botInfo, fetchInfo: fetchBotInfo } = useBotStore()
-  const { user } = useAuthStore()
+  const { user, token } = useAuthStore()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { addToast } = useToastStore()
@@ -184,6 +194,10 @@ export default function Admin() {
   const [reportFilter, setReportFilter] = useState<'all' | 'pending' | 'dismissed' | 'resolved'>('pending')
   const [searchQuery, setSearchQuery] = useState('')
 
+  // WebSocket & Charts
+  const wsRef = useRef<WebSocket | null>(null)
+  const [statsHistory, setStatsHistory] = useState<StatsPoint[]>([])
+
   // Mute/Ban selection
   const [muteDuration, setMuteDuration] = useState(24) // Default 24h
   const [banLevel, setBanLevel] = useState(1)
@@ -196,6 +210,68 @@ export default function Admin() {
       }, 60000)
       return () => clearInterval(interval)
   }, [])
+
+  // WebSocket Connection
+  useEffect(() => {
+      if (!user || configStatus !== 'success') return
+
+      const isAdmin = config.botOwnerId === user.id || (config.botAdmins || []).includes(user.id)
+      if (!isAdmin) return
+
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const host = window.location.host
+      
+      if (wsRef.current) return
+
+      const ws = new WebSocket(`${protocol}//${host}/v1/websocket?type=admin&authorization=Bearer ${token}`)
+      
+      ws.onopen = () => {
+          console.log('[Admin] WS Connected')
+      }
+
+      ws.onmessage = (event) => {
+          try {
+              const payload = JSON.parse(event.data)
+              if (payload.op === 'stats') {
+                  const data = payload.data
+                  
+                  // Update current stats
+                  setStats(prev => {
+                      if (!prev) return data // If null, set initial
+                      return { ...prev, ...data }
+                  })
+
+                  // Update history
+                  setStatsHistory(prev => {
+                      const newPoint = {
+                          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                          cpu: parseFloat(data.system.cpu.toFixed(1)),
+                          memory: parseFloat((data.system.memory / 1024 / 1024).toFixed(1)) // MB
+                      }
+                      const newHistory = [...prev, newPoint]
+                      if (newHistory.length > 60) newHistory.shift() // Keep last 60 seconds
+                      return newHistory
+                  })
+              }
+          } catch (e) {
+              console.error('WS Error', e)
+          }
+      }
+
+      ws.onclose = () => {
+          console.log('[Admin] WS Closed')
+          wsRef.current = null
+      }
+
+      wsRef.current = ws
+
+      return () => {
+          if (wsRef.current) {
+              wsRef.current.close()
+              wsRef.current = null
+          }
+      }
+  }, [user, config, configStatus])
   
   const getTimeLeft = (expires?: number) => {
       if (!expires) return null
@@ -496,68 +572,105 @@ export default function Admin() {
 
                   {/* System Resources & Status */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* System Stats */}
+                      {/* System Stats (Real-time Charts) */}
                       <div className="rounded-2xl bg-white p-8 shadow-xl dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
                           <h3 className="text-xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                               <Activity className="text-primary-600" />
                               {t('admin.stats.systemStatus')}
+                              <span className="ml-auto text-xs font-mono text-green-500 animate-pulse">● LIVE</span>
                           </h3>
                           
                           {stats.system && (
-                              <div className="space-y-6">
-                                  {/* CPU */}
-                                  <div>
+                              <div className="space-y-8">
+                                  {/* CPU Chart */}
+                                  <div className="h-48 w-full">
                                       <div className="flex justify-between mb-2">
                                           <span className="text-sm font-bold text-gray-500 flex items-center gap-2">
-                                              <Cpu size={16} /> {t('admin.stats.cpuUsage')}
+                                              <Cpu size={16} /> CPU Load
                                           </span>
                                           <span className="text-sm font-bold text-gray-900 dark:text-white">
                                               {stats.system.cpu.toFixed(1)}%
                                           </span>
                                       </div>
-                                      <div className="h-3 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                                          <div 
-                                              className={`h-full rounded-full transition-all duration-500 ${
-                                                  stats.system.cpu > 80 ? 'bg-red-500' : 
-                                                  stats.system.cpu > 50 ? 'bg-yellow-500' : 'bg-green-500'
-                                              }`}
-                                              style={{ width: `${Math.min(stats.system.cpu, 100)}%` }}
-                                          />
-                                      </div>
-                                      <p className="text-xs text-gray-400 mt-1">
-                                          {stats.system.cores} {t('admin.stats.cores')} • {stats.system.platform}
-                                      </p>
+                                      <ResponsiveContainer width="100%" height="100%">
+                                          <AreaChart data={statsHistory}>
+                                              <defs>
+                                                  <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
+                                                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                                                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                                  </linearGradient>
+                                              </defs>
+                                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" opacity={0.2} />
+                                              <XAxis dataKey="time" hide />
+                                              <YAxis domain={[0, 100]} hide />
+                                              <RechartsTooltip 
+                                                  contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
+                                                  itemStyle={{ color: '#fff' }}
+                                                  formatter={(value: number) => [`${value}%`, 'CPU']}
+                                                  labelStyle={{ color: '#9ca3af' }}
+                                              />
+                                              <Area 
+                                                  type="monotone" 
+                                                  dataKey="cpu" 
+                                                  stroke="#ef4444" 
+                                                  fillOpacity={1} 
+                                                  fill="url(#colorCpu)" 
+                                                  isAnimationActive={false}
+                                              />
+                                          </AreaChart>
+                                      </ResponsiveContainer>
                                   </div>
 
-                                  {/* RAM */}
-                                  <div>
+                                  {/* RAM Chart */}
+                                  <div className="h-48 w-full">
                                       <div className="flex justify-between mb-2">
                                           <span className="text-sm font-bold text-gray-500 flex items-center gap-2">
-                                              <HardDrive size={16} /> {t('admin.stats.ramUsage')}
+                                              <HardDrive size={16} /> RAM Usage
                                           </span>
                                           <span className="text-sm font-bold text-gray-900 dark:text-white">
                                               {formatBytes(stats.system.memory)} / {formatBytes(stats.system.memoryTotal)}
                                           </span>
                                       </div>
-                                      <div className="h-3 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                                          <div 
-                                              className="h-full rounded-full bg-purple-500 transition-all duration-500"
-                                              style={{ width: `${Math.min((stats.system.memory / stats.system.memoryTotal) * 100, 100)}%` }}
-                                          />
-                                      </div>
+                                      <ResponsiveContainer width="100%" height="100%">
+                                          <AreaChart data={statsHistory}>
+                                              <defs>
+                                                  <linearGradient id="colorRam" x1="0" y1="0" x2="0" y2="1">
+                                                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                                                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                                                  </linearGradient>
+                                              </defs>
+                                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" opacity={0.2} />
+                                              <XAxis dataKey="time" hide />
+                                              <YAxis hide domain={[0, 'auto']} />
+                                              <RechartsTooltip 
+                                                  contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
+                                                  itemStyle={{ color: '#fff' }}
+                                                  formatter={(value: number) => [`${value} MB`, 'RAM']}
+                                                  labelStyle={{ color: '#9ca3af' }}
+                                              />
+                                              <Area 
+                                                  type="monotone" 
+                                                  dataKey="memory" 
+                                                  stroke="#8b5cf6" 
+                                                  fillOpacity={1} 
+                                                  fill="url(#colorRam)" 
+                                                  isAnimationActive={false}
+                                              />
+                                          </AreaChart>
+                                      </ResponsiveContainer>
                                   </div>
 
-                                  {/* Uptime */}
+                                  {/* Uptime Grid */}
                                   <div className="grid grid-cols-2 gap-4 mt-4">
-                                      <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                                      <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
                                           <p className="text-xs font-bold text-gray-500 uppercase">{t('admin.stats.processUptime')}</p>
-                                          <p className="text-lg font-black text-gray-900 dark:text-white mt-1">
+                                          <p className="text-lg font-black text-gray-900 dark:text-white mt-1 font-mono">
                                               {formatDuration(stats.uptime * 1000)}
                                           </p>
                                       </div>
-                                      <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                                      <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
                                           <p className="text-xs font-bold text-gray-500 uppercase">{t('admin.stats.systemUptime')}</p>
-                                          <p className="text-lg font-black text-gray-900 dark:text-white mt-1">
+                                          <p className="text-lg font-black text-gray-900 dark:text-white mt-1 font-mono">
                                               {formatDuration(stats.system.uptime * 1000)}
                                           </p>
                                       </div>

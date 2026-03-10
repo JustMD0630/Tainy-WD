@@ -92,11 +92,17 @@ Se ha completado la integración del panel de administración (`/admin`) con el 
     *   **Persistencia Inteligente**: El idioma se sincroniza con la preferencia del usuario pero permite cambios manuales temporales sin "resetearse" agresivamente.
     *   **Bienvenida Personalizada**: Mensajes adaptativos ("Bienvenido de nuevo, [Usuario]" vs "Bienvenido").
 
-4.  **Social y Explorar (`/explore`)**:
+4.  **Panel de Administración Real (`/admin`)**:
+    *   **Dashboard en Tiempo Real**: Implementación de WebSocket dedicado (`/v1/websocket?type=admin`) para transmisión de métricas cada segundo.
+    *   **Visualización Profesional**: Integración de `recharts` para gráficos de área (CPU, RAM) con historial de 60 segundos.
+    *   **Indicadores Vivos**: Estado de conexión WebSocket y updates de uptime/nodos Lavalink en tiempo real.
+    *   **Seguridad**: Autenticación de WebSocket mediante Token Bearer con validación estricta de roles.
+
+5.  **Social y Explorar (`/explore`)**:
     *   **Meta Tags (Open Graph)**: Embeds enriquecidos con imagen grande y descripción al compartir el enlace en Discord/Twitter.
     *   **Sistema de Comentarios y Reportes**: Funcionalidad completa con moderación automática (ocultar tras 5 reportes).
 
-5.  **Biblioteca (`/library`)**:
+6.  **Biblioteca (`/library`)**:
     *   **Gestión de Playlists**: Creación, edición y borrado de playlists.
     *   **Seguridad**: Modal de confirmación antes de eliminar playlists para evitar accidentes.
     *   **Interfaz**: Diseño de tarjetas mejorado y adaptable a móvil.
@@ -214,11 +220,13 @@ Si retomas el proyecto, aquí es donde nos quedamos:
     *   Actualmente `/explore` muestra playlists, pero podría enriquecerse con "Playlists Destacadas" o "Más Escuchadas" si el backend soportara métricas de uso.
     *   Simular una experiencia más social mostrando avatares de usuarios que dieron "Like" (si se implementa sistema de likes).
 
-3.  **Panel de Administración Real (`/admin`)**:
-    *   Conectar las gráficas de estadísticas a datos reales en tiempo real (uso de RAM, CPU, total de canciones reproducidas hoy). Actualmente son funcionales pero básicos.
-
-4.  **Pruebas End-to-End (E2E)**:
+3.  **Pruebas End-to-End (E2E)**:
     *   No hay tests automatizados. Sería ideal añadir Cypress o Playwright para asegurar que el flujo de Login -> Dashboard -> Reproducir no se rompa con futuros cambios.
+
+4.  **Admin Advanced Features (Terminal/DB)**:
+    *   Implementar un visor de logs en tiempo real (Terminal WebSocket).
+    *   Gestor interactivo de nodos Lavalink (reconectar/desconectar desde UI).
+    *   Explorador visual de QuickDB para editar datos crudos.
 
 ---
 

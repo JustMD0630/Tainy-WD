@@ -21,7 +21,10 @@ export class GetAdminReports {
         for (const entry of allReports) {
             const report = entry.value
             // Fetch all reports, frontend handles filtering
-            const comment = await this.client.db.comment.get(report.commentId)
+            let comment = null
+            if (report.commentId) {
+                comment = await this.client.db.comment.get(report.commentId)
+            }
             const reporter = await this.client.users.fetch(report.reporterId).catch(() => null)
             
             let offender = null

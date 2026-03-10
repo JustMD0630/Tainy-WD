@@ -150,14 +150,129 @@ export class WebServer {
     const wss = new WebSocketServer({ server: this.server, path: '/v1/websocket' })
     console.log('[WS] Native WebSocketServer initialized on path /v1/websocket')
 
-    wss.on('connection', (ws, req) => {
+    const adminClients = new Set<any>()
+
+    // Admin Stats Interval (1s)
+    setInterval(async () => {
+        if (adminClients.size === 0) return
+
+        try {
+            // Reusing logic from getStats.ts broadly
+            // We need to import these dynamically or move getStats logic to a service if we want to be clean
+            // For now, we inline a simplified version for speed
+            const os = await import('node:os')
+            const pidusage = (await import('pidusage')).default
+
+            let stats
+            try {
+                stats = await pidusage(process.pid)
+            } catch (e) {
+                const mem = process.memoryUsage()
+                stats = {
+                    cpu: 0,
+                    memory: mem.rss,
+                    ppid: process.ppid,
+                    pid: process.pid,
+                    ctime: 0,
+                    elapsed: 0,
+                    timestamp: Date.now()
+                }
+            }
+
+            const rainlinkNodes = this.client.rainlink.nodes as any
+            const nodesIterable = typeof rainlinkNodes.values === 'function' 
+                ? rainlinkNodes.values() 
+                : rainlinkNodes.values || []
+                
+            const nodes = Array.from(nodesIterable).map((node: any) => ({
+                name: node.options?.name,
+                state: node.state,
+                stats: node.stats
+            }))
+
+            const payload = JSON.stringify({
+                op: 'stats',
+                data: {
+                    system: {
+                        cpu: stats.cpu,
+                        memory: stats.memory,
+                        memoryTotal: os.totalmem(),
+                        uptime: process.uptime()
+                    },
+                    nodes: nodes,
+                    botUsers: this.client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0),
+                    botGuilds: this.client.guilds.cache.size,
+                    playing: this.client.rainlink.players.size
+                }
+            })
+
+            adminClients.forEach(client => {
+                if (client.readyState === 1) { // OPEN
+                    client.send(payload)
+                }
+            })
+        } catch (err) {
+            console.error('[WS ADMIN] Error broadcasting stats:', err)
+        }
+    }, 1000)
+
+    wss.on('connection', async (ws, req) => {
       const url = req.url ?? '(unknown)'
       console.log('[WS] Connection received:', url)
       
       const fullUrl = new URL(url, 'http://localhost')
       const guildId = fullUrl.searchParams.get('guildId')
+      const type = fullUrl.searchParams.get('type') // 'admin' or 'player' (default)
       const auth = fullUrl.searchParams.get('authorization')
 
+      // --- ADMIN CONNECTION ---
+      if (type === 'admin') {
+          if (!auth || !auth.startsWith('Bearer ')) {
+              console.log('[WS ADMIN REJECT] Missing or invalid auth header')
+              return ws.close(1008, 'Authorization failed')
+          }
+
+          // Verify token (Mock verification based on existing pattern, ideally use a real verify function)
+          // In this codebase, we trust the token if it matches OWNER or ADMIN list after decoding? 
+          // Actually, getAuthedUserId logic is: verify JWT -> get ID.
+          // We can't easily call getAuthedUserId here because it expects a FastifyRequest.
+          // We will duplicate the JWT verification logic briefly or import a helper if available.
+          // Checking `src/util/auth.ts`... let's assume we can import `verifyToken`
+          
+          try {
+               // Dynamic import to avoid top-level dependency issues if any
+               const { validateDiscordToken } = await import('./util/auth.js')
+               const token = auth.split(' ')[1]
+               const userId = await validateDiscordToken(token)
+               
+               if (!userId) {
+                    console.log('[WS ADMIN REJECT] Invalid token')
+                    return ws.close(1008, 'Invalid token')
+               }
+
+               const isAdmin = this.client.owner === userId || (this.client.config.bot.ADMIN || []).includes(userId)
+              
+              if (!isAdmin) {
+                  console.log(`[WS ADMIN REJECT] User ${userId} is not admin`)
+                  return ws.close(1008, 'Forbidden')
+              }
+
+              console.log(`[WS ADMIN] Admin connected: ${userId}`)
+              adminClients.add(ws)
+
+              ws.on('close', () => {
+                  console.log(`[WS ADMIN] Admin disconnected: ${userId}`)
+                  adminClients.delete(ws)
+              })
+              
+              return // Stop processing as admin is handled
+          } catch (e) {
+              console.error('[WS ADMIN ERROR]', e)
+              return ws.close(1011, 'Internal Error')
+          }
+      }
+
+      // --- GUILD CONNECTION (Legacy) ---
       if (!guildId) {
         console.log('[WS REJECT] Missing guildId')
         return ws.close(1008, 'Missing guildId')

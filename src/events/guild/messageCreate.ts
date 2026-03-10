@@ -68,7 +68,7 @@ export default class {
     const mention = new RegExp(`^<@!?${client.user!.id}>( |)$`)
 
     const GuildPrefix = await client.db.prefix.get(`${message.guild!.id}`)
-    if (GuildPrefix) PREFIX = GuildPrefix
+    if (GuildPrefix) PREFIX = String(GuildPrefix)
     else if (!GuildPrefix)
       PREFIX = String(await client.db.prefix.set(`${message.guild!.id}`, client.prefix))
 
@@ -113,8 +113,9 @@ export default class {
       return
     }
     const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const prefixString = typeof PREFIX === 'string' ? PREFIX : String(PREFIX || client.prefix || 'd!')
     const prefixRegex = new RegExp(
-      `^(<@!?${client.user!.id}>|${escapeRegex(PREFIX.toLowerCase())})\\s*`,
+      `^(<@!?${client.user!.id}>|${escapeRegex(prefixString.toLowerCase())})\\s*`,
       'i'
     )
     if (!prefixRegex.test(message.content)) return

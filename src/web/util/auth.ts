@@ -15,17 +15,10 @@ setInterval(() => {
 }, 5 * 60 * 1000).unref() // unref to not prevent process exit
 
 /**
- * Helper to get the authenticated user ID from the request Authorization header.
- * Validates the token against Discord API.
- * Uses an in-memory cache to reduce Discord API calls.
+ * Validates a Discord Bearer token and returns the user ID.
+ * Uses an internal cache to reduce API calls.
  */
-export async function getAuthedUserId(req: FastifyRequest): Promise<string | null> {
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return null
-    }
-    const token = authHeader.split(' ')[1]
-
+export async function validateDiscordToken(token: string): Promise<string | null> {
     // Check cache
     const now = Date.now()
     const cached = authCache.get(token)
@@ -62,4 +55,18 @@ export async function getAuthedUserId(req: FastifyRequest): Promise<string | nul
     } catch (err) {
         return null
     }
+}
+
+/**
+ * Helper to get the authenticated user ID from the request Authorization header.
+ * Validates the token against Discord API.
+ * Uses an in-memory cache to reduce Discord API calls.
+ */
+export async function getAuthedUserId(req: FastifyRequest): Promise<string | null> {
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return null
+    }
+    const token = authHeader.split(' ')[1]
+    return validateDiscordToken(token)
 }
